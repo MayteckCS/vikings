@@ -46,19 +46,19 @@
             overflow: hidden;
         }
 
-        .slide.active {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+.slide.active {
+  display: block; /* no flex */
+}
 
-        .slide img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: cover;
-            /* base transform reset so Ken Burns works predictably */
-            transform: scale(1) translate(0, 0);
-        }
+/* force every image to cover the whole slide */
+.slide img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  max-height: none;
+  object-fit: cover;
+}
 
         /* Title Slide */
         .slide.title-slide {
