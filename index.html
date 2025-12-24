@@ -32,6 +32,8 @@
     border-radius: 12px;
     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
     overflow: hidden;
+    margin: 0;         /* ensure no vertical margin */
+    padding: 0;
 }
 
         .slide {
@@ -178,6 +180,11 @@
             transition: width 0.3s ease;
         }
 
+        .page-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
         /* Info Section */
         .info {
             display: none;
@@ -267,7 +274,7 @@
     </style>
 </head>
 <body>
-    <div class="page-wrapper" style="max-width:1000px;margin:0 auto;">
+    <div class="page-wrapper">
         <!-- Title ABOVE slideshow (no longer part of slides) -->
         <div class="title-banner">
             <h1>MARINA VIKINGS</h1>
