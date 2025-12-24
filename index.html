@@ -275,25 +275,12 @@
         <h1>MARINA VIKINGS</h1>
         <div class="subtitle">Football Banquet 2025 • Season Highlights</div>
       </div>
-      <div class="brand">
-        Powered by <strong>Mayteck CS</strong><br />
-        marina slideshow • vikings.mywebsite.com
-      </div>
     </header>
 
     <div class="viewport" id="slideshow">
       <img id="slideImage" class="slide-image active" src="" alt="Marina Vikings photo" />
       <div class="overlay">
         <div class="overlay-left">
-          <div class="badge">
-            <span>Marina Vikings</span>
-            <span class="team-colors">
-              <span class="color-dot color-navy"></span>
-              <span class="color-dot color-gold"></span>
-              <span class="color-dot color-white"></span>
-              <span class="color-dot color-powder"></span>
-            </span>
-          </div>
           <div class="slide-label" id="slideLabel">Loading photos…</div>
         </div>
         <div class="overlay-right">
@@ -502,7 +489,7 @@
 
     let currentIndex = 0;
     let isPlaying = true;
-    const slideDurationMs = 5000; // 5 seconds
+    const slideDurationMs = 10000; // 5 seconds
     let intervalId = null;
 
     function extractNiceName(path) {
