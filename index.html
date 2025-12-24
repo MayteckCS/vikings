@@ -1,344 +1,469 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Marina Vikings Banquet Slideshow</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <title>Marina Vikings Banquet Slideshow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    :root {
+      --navy: #001f3f;
+      --gold: #f9c80e;
+      --white: #ffffff;
+      --powder: #9fc5f8;
+      --bg: #020814;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0a1a3a 0, #020814 50%, #000000 100%);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .frame {
+      max-width: 1200px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 18px;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      padding: 12px 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 10px 2px;
+      border-bottom: 1px solid rgba(249, 200, 14, 0.3);
+    }
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    h1 {
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #d0d4ff;
+    }
+    .brand {
+      text-align: right;
+      font-size: 0.7rem;
+      color: #aaaaaa;
+    }
+    .brand a {
+      color: var(--powder);
+      text-decoration: none;
+    }
+    .brand a:hover {
+      text-decoration: underline;
+    }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #001f3f;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
+    .viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: radial-gradient(circle at center, #123 0, #000 60%);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .slide-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+      display: none;
+    }
+    .slide-image.active {
+      display: block;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(1.01); }
+      to { opacity: 1; transform: scale(1); }
+    }
 
-        .slideshow-container {
-            position: relative;
-            max-width: 1000px;
-            width: 100%;
-            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
+    .overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 10px;
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(0, 0, 0, 0.0) 40%
+      );
+    }
+    .overlay-left {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .overlay-right {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(249, 200, 14, 0.6);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #fefefe;
+    }
+    .team-colors {
+      display: flex;
+      gap: 3px;
+    }
+    .color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      border: 1px solid #000;
+    }
+    .color-navy { background: var(--navy); }
+    .color-gold { background: var(--gold); }
+    .color-white { background: var(--white); }
+    .color-powder { background: var(--powder); }
 
-        .slide {
-            display: none;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000000;
-            position: relative;
-        }
+    .slide-label {
+      font-size: 0.75rem;
+      color: #e0e4ff;
+      background: rgba(0, 0, 0, 0.6);
+      padding: 2px 8px;
+      border-radius: 999px;
+    }
 
-        .slide.active {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 4px 0;
+    }
+    .controls-left,
+    .controls-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
 
-        .slide img {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-        }
+    button {
+      cursor: pointer;
+      border: none;
+      outline: none;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #fefefe;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    button.primary {
+      background: linear-gradient(135deg, var(--gold), #ffdf6b);
+      color: #000;
+      font-weight: 600;
+      border-color: rgba(0, 0, 0, 0.5);
+    }
+    button.icon {
+      padding-inline: 8px;
+      min-width: 30px;
+      justify-content: center;
+    }
+    button:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+    button.primary:hover {
+      filter: brightness(1.05);
+    }
 
-        /* Title Slide */
-        .slide.title-slide {
-            background: linear-gradient(135deg, #001f3f 0%, #FFD700 100%);
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-        }
+    .status {
+      font-size: 0.75rem;
+      color: #c8ccff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #24d36b;
+      box-shadow: 0 0 8px #24d36b;
+    }
 
-        .slide.title-slide h1 {
-            font-size: 4rem;
-            color: #ffffff;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
-            margin-bottom: 20px;
-            font-weight: bold;
-        }
+    .progress-bar-container {
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--powder));
+      transition: width 0.25s linear;
+    }
 
-        .slide.title-slide .subtitle {
-            font-size: 2rem;
-            color: #001f3f;
-            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
-        }
+    .helper-text {
+      margin-top: 4px;
+      font-size: 0.7rem;
+      color: #9aa0ff;
+      text-align: center;
+    }
 
-        /* Controls */
-        .controls {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 15px;
-            align-items: center;
-            z-index: 10;
-            background: rgba(0, 31, 63, 0.85);
-            padding: 15px 30px;
-            border-radius: 50px;
-        }
-
-        button {
-            background: #FFD700;
-            border: none;
-            padding: 10px 20px;
-            border-radius: 25px;
-            cursor: pointer;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #001f3f;
-            transition: all 0.3s ease;
-        }
-
-        button:hover {
-            background: #FFA500;
-            transform: scale(1.05);
-        }
-
-        button:active {
-            transform: scale(0.95);
-        }
-
-        .play-pause-btn {
-            width: 50px;
-            height: 50px;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 50%;
-            font-size: 1.5rem;
-        }
-
-        .counter {
-            color: #FFD700;
-            font-weight: bold;
-            font-size: 1.1rem;
-            min-width: 80px;
-            text-align: center;
-        }
-
-        /* Progress Bar */
-        .progress-bar {
-            width: 100%;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            position: absolute;
-            bottom: 0;
-            left: 0;
-        }
-
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #FFD700, #FFA500);
-            width: 0%;
-            transition: width 0.3s ease;
-        }
-
-        /* Info Section */
-        .info {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: rgba(0, 31, 63, 0.9);
-            padding: 15px 20px;
-            border-radius: 8px;
-            border-left: 4px solid #FFD700;
-            font-size: 0.9rem;
-        }
-
-        .info p {
-            margin: 5px 0;
-        }
-
-        /* Responsive */
-        @media (max-width: 768px) {
-            .slide.title-slide h1 {
-                font-size: 2.5rem;
-            }
-
-            .slide.title-slide .subtitle {
-                font-size: 1.5rem;
-            }
-
-            .controls {
-                flex-wrap: wrap;
-                justify-content: center;
-                gap: 10px;
-                padding: 10px 15px;
-            }
-
-            button {
-                padding: 8px 16px;
-                font-size: 0.9rem;
-            }
-
-            .counter {
-                font-size: 1rem;
-            }
-        }
-    </style>
+    @media (max-width: 768px) {
+      .frame {
+        padding: 10px;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .brand {
+        align-self: flex-end;
+      }
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .controls-left,
+      .controls-right {
+        justify-content: space-between;
+      }
+    }
+  </style>
 </head>
 <body>
-    <div class="slideshow-container">
-        <!-- Title Slide -->
-        <div class="slide title-slide active">
-            <h1>MARINA VIKINGS</h1>
-            <p class="subtitle">Football Banquet 2025</p>
-        </div>
+  <div class="frame">
+    <header>
+      <div class="title-block">
+        <h1>MARINA VIKINGS</h1>
+        <div class="subtitle">Football Banquet 2025 • Season Highlights</div>
+      </div>
+      <div class="brand">
+        Powered by <strong>Mayteck CS</strong><br />
+        marina slideshow • vikings.mywebsite.com
+      </div>
+    </header>
 
-        <!-- Photo slides (placeholder - will be filled with images) -->
-        <!-- Add your images here -->
-
-        <!-- End Slide -->
-        <div class="slide" style="background: linear-gradient(135deg, #001f3f 0%, #FFD700 100%); display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-            <h2 style="font-size: 3rem; color: white; margin-bottom: 20px;">Thank You!</h2>
-            <p style="font-size: 1.5rem; color: #001f3f;">Go Vikings! 🏈</p>
+    <div class="viewport" id="slideshow">
+      <img id="slideImage" class="slide-image active" src="" alt="Marina Vikings photo" />
+      <div class="overlay">
+        <div class="overlay-left">
+          <div class="badge">
+            <span>Marina Vikings</span>
+            <span class="team-colors">
+              <span class="color-dot color-navy"></span>
+              <span class="color-dot color-gold"></span>
+              <span class="color-dot color-white"></span>
+              <span class="color-dot color-powder"></span>
+            </span>
+          </div>
+          <div class="slide-label" id="slideLabel">Loading photos…</div>
         </div>
-
-        <!-- Controls -->
-        <div class="controls">
-            <button class="play-pause-btn" title="Play/Pause">▶</button>
-            <button onclick="previousSlide()" title="Previous">← Back</button>
-            <span class="counter"><span id="current">1</span> / <span id="total">0</span></span>
-            <button onclick="nextSlide()" title="Next">Next →</button>
+        <div class="overlay-right">
+          <div class="status">
+            <span class="dot" id="playStatusDot"></span>
+            <span id="playStatusText">Auto-play: ON</span>
+          </div>
         </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-bar">
-            <div class="progress-fill"></div>
-        </div>
-
-        <!-- Info Section -->
-        <div class="info">
-            <p><strong>Marina Vikings</strong></p>
-            <p>Navy Blue • Gold/Yellow • White</p>
-            <p id="timer">Auto-play: ON</p>
-        </div>
+      </div>
     </div>
 
-    <script>
-        let currentSlide = 0;
-        let isPlaying = true;
-        let autoPlayInterval;
-        const autoPlaySpeed = 5000; // 5 seconds per slide
+    <div class="controls">
+      <div class="controls-left">
+        <button id="playPauseBtn" class="primary" type="button">
+          <span id="playPauseIcon">⏸</span>
+          <span id="playPauseText">Pause</span>
+        </button>
+        <button id="prevBtn" class="icon" type="button">← Back</button>
+        <div class="status" id="counter">1 / 1</div>
+        <button id="nextBtn" class="icon" type="button">Next →</button>
+      </div>
+      <div class="controls-right">
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+    </div>
 
-        // Initialize
-        function init() {
-            const totalSlides = document.querySelectorAll('.slide').length;
-            document.getElementById('total').textContent = totalSlides;
-            startAutoPlay();
-            setupPlayButton();
-        }
+    <div class="helper-text">
+      Space = Play/Pause • ←/→ = Previous/Next • Double-click slideshow for full-screen
+    </div>
+  </div>
 
-        function showSlide(n) {
-            const slides = document.querySelectorAll('.slide');
-            
-            if (n >= slides.length) {
-                currentSlide = 0;
-            } else if (n < 0) {
-                currentSlide = slides.length - 1;
-            } else {
-                currentSlide = n;
-            }
+  <script>
+    // 1) LIST YOUR IMAGE FILES HERE (from /images folder)
+    //    Example:
+    //    "images/0 (1).jpg",
+    //    "images/0 (2).jpg",
+    //    "images/unnamed (1).jpg",
+    //
+    // Easiest way: copy all filenames, then prepend "images/" to each.
+    const imageFiles = [
+      // TODO: REPLACE THIS LIST WITH YOUR REAL FILES
+      // "images/0 (1).jpg",
+      // "images/0 (2).jpg",
+      // "images/0 (3).jpg",
+      // "images/unnamed (1).jpg",
+      // "images/unnamed (2).jpg"
+    ];
 
-            // Hide all slides
-            slides.forEach(slide => slide.classList.remove('active'));
-            
-            // Show current slide
-            slides[currentSlide].classList.add('active');
-            
-            // Update counter
-            document.getElementById('current').textContent = currentSlide + 1;
-            
-            // Update progress bar
-            const progress = ((currentSlide + 1) / slides.length) * 100;
-            document.querySelector('.progress-fill').style.width = progress + '%';
-        }
+    // 2) Slideshow logic
+    const slideImage = document.getElementById("slideImage");
+    const slideLabel = document.getElementById("slideLabel");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const playPauseIcon = document.getElementById("playPauseIcon");
+    const playPauseText = document.getElementById("playPauseText");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const counter = document.getElementById("counter");
+    const progressBar = document.getElementById("progressBar");
+    const playStatusDot = document.getElementById("playStatusDot");
+    const playStatusText = document.getElementById("playStatusText");
+    const viewport = document.getElementById("slideshow");
 
-        function nextSlide() {
-            showSlide(currentSlide + 1);
-            resetAutoPlay();
-        }
+    let currentIndex = 0;
+    let isPlaying = true;
+    const slideDurationMs = 5000; // 5 seconds
+    let intervalId = null;
 
-        function previousSlide() {
-            showSlide(currentSlide - 1);
-            resetAutoPlay();
-        }
+    function extractNiceName(path) {
+      const fileName = path.split("/").pop();
+      return fileName.replace(/\.[^.]+$/, "");
+    }
 
-        function startAutoPlay() {
-            if (!isPlaying) return;
-            
-            autoPlayInterval = setInterval(() => {
-                showSlide(currentSlide + 1);
-            }, autoPlaySpeed);
-        }
+    function updateUI() {
+      const total = imageFiles.length || 1;
+      const safeIndex = Math.min(currentIndex, total - 1);
 
-        function stopAutoPlay() {
-            clearInterval(autoPlayInterval);
-        }
+      if (imageFiles.length === 0) {
+        slideImage.src = "";
+        slideLabel.textContent = "No photos found – please add filenames in index.html.";
+        counter.textContent = "0 / 0";
+        progressBar.style.width = "0%";
+        return;
+      }
 
-        function resetAutoPlay() {
-            stopAutoPlay();
-            startAutoPlay();
-        }
+      const src = imageFiles[safeIndex];
+      slideImage.src = src;
+      slideImage.classList.add("active");
+      slideLabel.textContent = extractNiceName(src);
+      counter.textContent = (safeIndex + 1) + " / " + total;
+      progressBar.style.width = ((safeIndex + 1) / total) * 100 + "%";
 
-        function toggleAutoPlay() {
-            isPlaying = !isPlaying;
-            const btn = document.querySelector('.play-pause-btn');
-            const timer = document.getElementById('timer');
+      if (isPlaying) {
+        playStatusDot.style.background = "#24d36b";
+        playStatusDot.style.boxShadow = "0 0 8px #24d36b";
+        playStatusText.textContent = "Auto-play: ON";
+        playPauseIcon.textContent = "⏸";
+        playPauseText.textContent = "Pause";
+      } else {
+        playStatusDot.style.background = "#ff4757";
+        playStatusDot.style.boxShadow = "0 0 8px #ff4757";
+        playStatusText.textContent = "Auto-play: OFF";
+        playPauseIcon.textContent = "▶";
+        playPauseText.textContent = "Play";
+      }
+    }
 
-            if (isPlaying) {
-                btn.textContent = '⏸';
-                timer.textContent = 'Auto-play: ON';
-                startAutoPlay();
-            } else {
-                btn.textContent = '▶';
-                timer.textContent = 'Auto-play: OFF';
-                stopAutoPlay();
-            }
-        }
+    function nextSlide() {
+      if (imageFiles.length === 0) return;
+      currentIndex = (currentIndex + 1) % imageFiles.length;
+      updateUI();
+    }
 
-        function setupPlayButton() {
-            const btn = document.querySelector('.play-pause-btn');
-            btn.textContent = '⏸';
-            btn.addEventListener('click', toggleAutoPlay);
-        }
+    function prevSlide() {
+      if (imageFiles.length === 0) return;
+      currentIndex = (currentIndex - 1 + imageFiles.length) % imageFiles.length;
+      updateUI();
+    }
 
-        // Keyboard navigation
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight') nextSlide();
-            if (e.key === 'ArrowLeft') previousSlide();
-            if (e.key === ' ') {
-                e.preventDefault();
-                toggleAutoPlay();
-            }
-        });
+    function startAutoPlay() {
+      if (intervalId) clearInterval(intervalId);
+      intervalId = setInterval(() => {
+        if (isPlaying) nextSlide();
+      }, slideDurationMs);
+    }
 
-        // Full-screen on double click
-        document.querySelector('.slideshow-container').addEventListener('dblclick', () => {
-            if (document.fullscreenElement) {
-                document.exitFullscreen();
-            } else {
-                document.querySelector('.slideshow-container').requestFullscreen().catch(() => {});
-            }
-        });
+    function togglePlayPause() {
+      isPlaying = !isPlaying;
+      updateUI();
+    }
 
-        // Start the slideshow
-        init();
-    </script>
+    playPauseBtn.addEventListener("click", togglePlayPause);
+    nextBtn.addEventListener("click", () => {
+      isPlaying = false;
+      updateUI();
+      nextSlide();
+    });
+    prevBtn.addEventListener("click", () => {
+      isPlaying = false;
+      updateUI();
+      prevSlide();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        togglePlayPause();
+      } else if (e.key === "ArrowRight") {
+        isPlaying = false;
+        updateUI();
+        nextSlide();
+      } else if (e.key === "ArrowLeft") {
+        isPlaying = false;
+        updateUI();
+        prevSlide();
+      }
+    });
+
+    viewport.addEventListener("dblclick", () => {
+      if (!document.fullscreenElement) {
+        viewport.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    // init
+    updateUI();
+    startAutoPlay();
+  </script>
 </body>
 </html>
