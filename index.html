@@ -25,14 +25,14 @@
         }
 
         .slideshow-container {
-            position: relative;
-            max-width: 1000px;
-            width: 100%;
-            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
-            border-radius: 12px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            overflow: hidden;
-        }
+    position: relative;
+    max-width: 1000px;
+    width: 100%;
+    background: #000;        /* just black around photos */
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+}
 
         .slide {
             display: none;
@@ -81,6 +81,30 @@
             color: #001f3f;
             text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
         }
+
+        .title-banner {
+    text-align: center;
+    margin-bottom: 12px;
+}
+
+.title-banner h1 {
+    font-size: 2.4rem;
+    letter-spacing: 0.12em;
+}
+
+.title-banner .subtitle {
+    font-size: 1.2rem;
+    color: #e5e5e5;
+}
+
+/* controls now outside slideshow */
+.slideshow-controls {
+    margin-top: 10px;
+    display: flex;
+    gap: 15px;
+    align-items: center;
+    justify-content: center;
+}
 
         /* Controls */
         .controls {
@@ -243,39 +267,35 @@
     </style>
 </head>
 <body>
-    <div class="slideshow-container">
-        <!-- Title Slide -->
-        <div class="slide title-slide active">
+    <div class="page-wrapper" style="max-width:1000px;margin:0 auto;">
+        <!-- Title ABOVE slideshow (no longer part of slides) -->
+        <div class="title-banner">
             <h1>MARINA VIKINGS</h1>
             <p class="subtitle">Football Banquet 2025</p>
         </div>
 
-        <!-- Photo slides will be injected via JavaScript -->
+        <!-- Slideshow: ONLY images/end slide -->
+        <div class="slideshow-container">
+            <!-- Photo slides will be injected via JavaScript -->
 
-        <!-- End Slide -->
-        <div class="slide" id="end-slide" style="background: linear-gradient(135deg, #001f3f 0%, #FFD700 100%); display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
-            <h2 style="font-size: 3rem; color: white; margin-bottom: 20px;">Thank You!</h2>
-            <p style="font-size: 1.5rem; color: #001f3f;">Go Vikings! 🏈</p>
+            <!-- End Slide -->
+            <div class="slide" id="end-slide" style="background: linear-gradient(135deg, #001f3f 0%, #FFD700 100%); display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+                <h2 style="font-size: 3rem; color: white; margin-bottom: 20px;">Thank You!</h2>
+                <p style="font-size: 1.5rem; color: #001f3f;">Go Vikings! 🏈</p>
+            </div>
+
+            <!-- Progress Bar (stays on top of slideshow) -->
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
         </div>
 
-        <!-- Controls -->
-        <div class="controls">
+        <!-- Controls BELOW slideshow -->
+        <div class="slideshow-controls">
             <button class="play-pause-btn" title="Play/Pause">▶</button>
             <button onclick="previousSlide()" title="Previous">← Back</button>
             <span class="counter"><span id="current">1</span> / <span id="total">0</span></span>
             <button onclick="nextSlide()" title="Next">Next →</button>
-        </div>
-
-        <!-- Progress Bar -->
-        <div class="progress-bar">
-            <div class="progress-fill"></div>
-        </div>
-
-        <!-- Info Section -->
-        <div class="info">
-            <p><strong>Marina Vikings</strong></p>
-            <p>Navy Blue • Gold/Yellow • White</p>
-            <p id="timer">Auto-play: ON</p>
         </div>
     </div>
 
