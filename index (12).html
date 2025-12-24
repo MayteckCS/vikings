@@ -1,0 +1,611 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Marina Vikings Banquet Slideshow</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <link rel="shortcut icon" href="favicon.png">
+  <style>
+    :root {
+      --navy: #001f3f;
+      --gold: #f9c80e;
+      --white: #ffffff;
+      --powder: #9fc5f8;
+      --bg: #020814;
+    }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #0a1a3a 0, #020814 50%, #000000 100%);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+    }
+    .frame {
+      max-width: 1200px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 18px;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      padding: 12px 12px 16px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 10px 2px;
+      border-bottom: 1px solid rgba(249, 200, 14, 0.3);
+    }
+    .title-block {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+    h1 {
+      font-size: 1.2rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+    }
+    .subtitle {
+      font-size: 0.8rem;
+      color: #d0d4ff;
+    }
+    .brand {
+      text-align: right;
+      font-size: 0.7rem;
+      color: #aaaaaa;
+    }
+    .brand a {
+      color: var(--powder);
+      text-decoration: none;
+    }
+    .brand a:hover {
+      text-decoration: underline;
+    }
+
+    .viewport {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: radial-gradient(circle at center, #123 0, #000 60%);
+      border-radius: 14px;
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+    .slide-image {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+      background: #000;
+      display: none;
+    }
+    .slide-image.active {
+      display: block;
+      animation: fadeIn 0.5s ease-in-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(1.01); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .overlay {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding: 10px;
+      background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.6) 0%,
+        rgba(0, 0, 0, 0.0) 40%
+      );
+    }
+    .overlay-left {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+    .overlay-right {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 4px;
+    }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(249, 200, 14, 0.6);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: #fefefe;
+    }
+    .team-colors {
+      display: flex;
+      gap: 3px;
+    }
+    .color-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 999px;
+      border: 1px solid #000;
+    }
+    .color-navy { background: var(--navy); }
+    .color-gold { background: var(--gold); }
+    .color-white { background: var(--white); }
+    .color-powder { background: var(--powder); }
+
+    .slide-label {
+      display: none;
+    }
+
+    .controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      padding: 6px 4px 0;
+    }
+    .controls-left,
+    .controls-right {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    button {
+      cursor: pointer;
+      border: none;
+      outline: none;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 999px;
+      padding: 4px 10px;
+      color: #fefefe;
+      font-size: 0.8rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    button.primary {
+      background: linear-gradient(135deg, var(--gold), #ffdf6b);
+      color: #000;
+      font-weight: 600;
+      border-color: rgba(0, 0, 0, 0.5);
+    }
+    button.icon {
+      padding-inline: 8px;
+      min-width: 30px;
+      justify-content: center;
+    }
+    button:hover {
+      background-color: rgba(255, 255, 255, 0.12);
+    }
+    button.primary:hover {
+      filter: brightness(1.05);
+    }
+
+    .status {
+      font-size: 0.75rem;
+      color: #c8ccff;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #24d36b;
+      box-shadow: 0 0 8px #24d36b;
+    }
+
+    .progress-bar-container {
+      flex: 1;
+      height: 4px;
+      background: rgba(255, 255, 255, 0.08);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .progress-bar {
+      width: 0%;
+      height: 100%;
+      background: linear-gradient(90deg, var(--gold), var(--powder));
+      transition: width 0.25s linear;
+    }
+
+    .helper-text {
+      margin-top: 4px;
+      font-size: 0.7rem;
+      color: #9aa0ff;
+      text-align: center;
+    }
+
+    @media (max-width: 768px) {
+      .frame {
+        padding: 10px;
+      }
+      header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .brand {
+        align-self: flex-end;
+      }
+      .controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .controls-left,
+      .controls-right {
+        justify-content: space-between;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="frame">
+    <header>
+      <div class="title-block">
+        <h1>MARINA VIKINGS</h1>
+        <div class="subtitle">Football Banquet 2025 • Season Highlights</div>
+      </div>
+    </header>
+
+    <div class="viewport" id="slideshow">
+      <img id="slideImage" class="slide-image active" src="" alt="Marina Vikings photo" />
+      <div class="overlay">
+        <div class="overlay-left">
+          <div class="slide-label" id="slideLabel">Loading photos…</div>
+        </div>
+        <div class="overlay-right">
+          <div class="status">
+            <span class="dot" id="playStatusDot"></span>
+            <span id="playStatusText">Auto-play: ON</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="controls">
+      <div class="controls-left">
+        <button id="playPauseBtn" class="primary" type="button">
+          <span id="playPauseIcon">⏸</span>
+          <span id="playPauseText">Pause</span>
+        </button>
+        <button id="prevBtn" class="icon" type="button">← Back</button>
+        <div class="status" id="counter">1 / 1</div>
+        <button id="nextBtn" class="icon" type="button">Next →</button>
+      </div>
+      <div class="controls-right">
+        <div class="progress-bar-container">
+          <div class="progress-bar" id="progressBar"></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="helper-text">
+      Space = Play/Pause • ←/→ = Previous/Next • Double-click slideshow for full-screen
+    </div>
+  </div>
+
+  <script>
+    // 1) LIST YOUR IMAGE FILES HERE (from /images folder)
+    //    Example:
+    //    "images/0 (1).jpg",
+    //    "images/0 (2).jpg",
+    //    "images/unnamed (1).jpg",
+    //
+    // Easiest way: copy all filenames, then prepend "images/" to each.
+    const imageFiles = [
+  "images/0.jpg",
+  "images/0(1).jpg",
+  "images/0(2).jpg",
+  "images/0(3).jpg",
+  "images/0(4).jpg",
+  "images/0(5).jpg",
+  "images/0(6).jpg",
+  "images/0(7).jpg",
+  "images/0(8).jpg",
+  "images/0(9).jpg",
+  "images/0(10).jpg",
+  "images/0(11).jpg",
+  "images/0(12).jpg",
+  "images/0(13).jpg",
+  "images/0(14).jpg",
+  "images/0(15).jpg",
+  "images/0(16).jpg",
+  "images/0(17).jpg",
+  "images/0(18).jpg",
+  "images/0(19).jpg",
+  "images/0(20).jpg",
+  "images/0(21).jpg",
+  "images/0(22).jpg",
+  "images/0(23).jpg",
+  "images/0(24).jpg",
+  "images/0(25).jpg",
+  "images/0(26).jpg",
+  "images/0(27).jpg",
+  "images/0(28).jpg",
+  "images/0(29).jpg",
+  "images/0(30).jpg",
+  "images/0(31).jpg",
+  "images/0(32).jpg",
+  "images/0(33).jpg",
+  "images/0(34).jpg",
+  "images/0(35).jpg",
+  "images/0(36).jpg",
+  "images/0(37).jpg",
+  "images/0(38).jpg",
+  "images/0(39).jpg",
+  "images/0(40).jpg",
+  "images/0(41).jpg",
+  "images/0(42).jpg",
+  "images/0(43).jpg",
+  "images/0(44).jpg",
+  "images/0(45).jpg",
+  "images/0(46).jpg",
+  "images/0(47).jpg",
+  "images/0(48).jpg",
+  "images/0(49).jpg",
+  "images/0(50).jpg",
+  "images/0(51).jpg",
+  "images/0(52).jpg",
+  "images/0(53).jpg",
+  "images/0(54).jpg",
+  "images/0(55).jpg",
+  "images/0(56).jpg",
+  "images/0(57).jpg",
+  "images/0(58).jpg",
+  "images/0(59).jpg",
+  "images/0(60).jpg",
+  "images/0(61).jpg",
+  "images/0(62).jpg",
+  "images/0(63).jpg",
+  "images/0(64).jpg",
+  "images/0(65).jpg",
+  "images/0(66).jpg",
+  "images/0(67).jpg",
+  "images/0(68).jpg",
+  "images/0(69).jpg",
+  "images/0(70).jpg",
+  "images/0(71).jpg",
+  "images/0(72).jpg",
+  "images/0(73).jpg",
+  "images/0(74).jpg",
+  "images/0(75).jpg",
+  "images/0(76).jpg",
+  "images/0(77).jpg",
+  "images/0(78).jpg",
+  "images/0(79).jpg",
+  "images/0(80).jpg",
+  "images/0(81).jpg",
+  "images/0(82).jpg",
+  "images/0(83).jpg",
+  "images/0(84).jpg",
+  "images/0(85).jpg",
+  "images/0(86).jpg",
+  "images/0(87).jpg",
+  "images/0(88).jpg",
+  "images/0(89).jpg",
+  "images/0(90).jpg",
+  "images/0(91).jpg",
+  "images/0(92).jpg",
+  "images/0(93).jpg",
+  "images/0(94).jpg",
+  "images/0(95).jpg",
+  "images/0(96).jpg",
+  "images/0(97).jpg",
+  "images/0(98).jpg",
+  "images/0(99).jpg",
+  "images/0(100).jpg",
+  "images/0(101).jpg",
+  "images/0(102).jpg",
+  "images/0(103).jpg",
+  "images/0(104).jpg",
+  "images/0(105).jpg",
+  "images/0(106).jpg",
+  "images/0(107).jpg",
+  "images/0(108).jpg",
+  "images/0(109).jpg",
+  "images/0(110).jpg",
+  "images/0(111).jpg",
+  "images/0(112).jpg",
+  "images/0(113).jpg",
+  "images/0(114).jpg",
+  "images/0(115).jpg",
+  "images/0(116).jpg",  
+  "images/0(117).jpg",
+  "images/0(118).jpg",
+  "images/0(119).jpg",
+  "images/unnamed.jpg",
+  "images/unnamed(1).jpg",
+  "images/unnamed(2).jpg",
+  "images/unnamed(3).jpg",
+  "images/unnamed(4).jpg",
+  "images/unnamed(5).jpg",
+  "images/unnamed(6).jpg",
+  "images/unnamed(7).jpg",
+  "images/unnamed(8).jpg",
+  "images/unnamed(9).jpg",
+  "images/unnamed(10).jpg",
+  "images/unnamed(11).jpg",
+  "images/unnamed(12).jpg",
+  "images/unnamed(13).jpg",
+  "images/unnamed(14).jpg",
+  "images/unnamed(15).jpg",
+  "images/unnamed(16).jpg",
+  "images/unnamed(17).jpg",
+  "images/unnamed(18).jpg",
+  "images/unnamed(19).jpg",
+  "images/unnamed(20).jpg",
+  "images/unnamed(21).jpg",
+  "images/unnamed(22).jpg",
+  "images/unnamed(23).jpg",
+  "images/unnamed(24).jpg",
+  "images/unnamed(25).jpg",
+  "images/unnamed(26).jpg",
+  "images/unnamed(27).jpg",
+  "images/unnamed(28).jpg",
+  "images/unnamed(29).jpg",
+  "images/unnamed(30).jpg"
+];
+
+   // Shuffle array function (Fisher-Yates)
+function shuffleArray(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+  return array;
+}
+
+// Shuffle the images
+shuffleArray(imageFiles); 
+
+    // 2) Slideshow logic
+    const slideImage = document.getElementById("slideImage");
+    const slideLabel = document.getElementById("slideLabel");
+    const playPauseBtn = document.getElementById("playPauseBtn");
+    const playPauseIcon = document.getElementById("playPauseIcon");
+    const playPauseText = document.getElementById("playPauseText");
+    const prevBtn = document.getElementById("prevBtn");
+    const nextBtn = document.getElementById("nextBtn");
+    const counter = document.getElementById("counter");
+    const progressBar = document.getElementById("progressBar");
+    const playStatusDot = document.getElementById("playStatusDot");
+    const playStatusText = document.getElementById("playStatusText");
+    const viewport = document.getElementById("slideshow");
+
+    let currentIndex = 0;
+    let isPlaying = true;
+    const slideDurationMs = 10000; // 5 seconds
+    let intervalId = null;
+
+    function extractNiceName(path) {
+      const fileName = path.split("/").pop();
+      return fileName.replace(/\.[^.]+$/, "");
+    }
+
+    function updateUI() {
+      const total = imageFiles.length || 1;
+      const safeIndex = Math.min(currentIndex, total - 1);
+
+      if (imageFiles.length === 0) {
+        slideImage.src = "";
+        slideLabel.textContent = "No photos found – please add filenames in index.html.";
+        counter.textContent = "0 / 0";
+        progressBar.style.width = "0%";
+        return;
+      }
+
+      const src = imageFiles[safeIndex];
+      slideImage.src = src;
+      slideImage.classList.add("active");
+      slideLabel.textContent = extractNiceName(src);
+      counter.textContent = (safeIndex + 1) + " / " + total;
+      progressBar.style.width = ((safeIndex + 1) / total) * 100 + "%";
+
+      if (isPlaying) {
+        playStatusDot.style.background = "#24d36b";
+        playStatusDot.style.boxShadow = "0 0 8px #24d36b";
+        playStatusText.textContent = "Auto-play: ON";
+        playPauseIcon.textContent = "⏸";
+        playPauseText.textContent = "Pause";
+      } else {
+        playStatusDot.style.background = "#ff4757";
+        playStatusDot.style.boxShadow = "0 0 8px #ff4757";
+        playStatusText.textContent = "Auto-play: OFF";
+        playPauseIcon.textContent = "▶";
+        playPauseText.textContent = "Play";
+      }
+    }
+
+    function nextSlide() {
+      if (imageFiles.length === 0) return;
+      currentIndex = (currentIndex + 1) % imageFiles.length;
+      updateUI();
+    }
+
+    function prevSlide() {
+      if (imageFiles.length === 0) return;
+      currentIndex = (currentIndex - 1 + imageFiles.length) % imageFiles.length;
+      updateUI();
+    }
+
+    function startAutoPlay() {
+      if (intervalId) clearInterval(intervalId);
+      intervalId = setInterval(() => {
+        if (isPlaying) nextSlide();
+      }, slideDurationMs);
+    }
+
+    function togglePlayPause() {
+      isPlaying = !isPlaying;
+      updateUI();
+    }
+
+    playPauseBtn.addEventListener("click", togglePlayPause);
+    nextBtn.addEventListener("click", () => {
+      isPlaying = false;
+      updateUI();
+      nextSlide();
+    });
+    prevBtn.addEventListener("click", () => {
+      isPlaying = false;
+      updateUI();
+      prevSlide();
+    });
+
+    document.addEventListener("keydown", (e) => {
+      if (e.code === "Space") {
+        e.preventDefault();
+        togglePlayPause();
+      } else if (e.key === "ArrowRight") {
+        isPlaying = false;
+        updateUI();
+        nextSlide();
+      } else if (e.key === "ArrowLeft") {
+        isPlaying = false;
+        updateUI();
+        prevSlide();
+      }
+    });
+
+    viewport.addEventListener("dblclick", () => {
+      if (!document.fullscreenElement) {
+        viewport.requestFullscreen().catch(() => {});
+      } else {
+        document.exitFullscreen().catch(() => {});
+      }
+    });
+
+    // init
+    updateUI();
+    startAutoPlay();
+  </script>
+</body>
+</html>
