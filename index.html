@@ -38,26 +38,27 @@
 }
 
         .slide {
-            display: none;
-            width: 100%;
-            aspect-ratio: 16 / 9;
-            background: #000000;
-            position: relative;
-            overflow: hidden;
-        }
-
-.slide.active {
-  display: block; /* no flex */
+  display: none;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #000;
+  position: relative;
+  overflow: hidden;
 }
 
-/* force every image to cover the whole slide */
+.slide.active {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+/* Images: fill the slide, but don’t exceed it */
 .slide img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  max-width: none;
-  max-height: none;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: cover;   /* fills as much as possible without distortion */
 }
 
         /* Title Slide */
