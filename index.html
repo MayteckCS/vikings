@@ -13,19 +13,7 @@
             box-sizing: border-box;
         }
 
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #001f3f;
-            color: #ffffff;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            padding: 0;
-        }
-
-        .slideshow-container {
+            .slideshow-container {
     position: relative;
     max-width: 1000px;
     width: 100%;
@@ -37,10 +25,17 @@
     padding: 0;
 }
 
-        .slide {
+        body {
+  margin: 0;
+  padding: 0;
+  /* keep your existing background/font/etc. here */
+}
+
+/* 2. Slide is just a flex box that fills its parent */
+.slide {
   display: none;
   width: 100%;
-  aspect-ratio: 16 / 9;
+  height: 100%;
   background: #000;
   position: relative;
   overflow: hidden;
@@ -52,15 +47,14 @@
   align-items: center;
 }
 
-/* Images: fill the slide, but don’t exceed it */
+/* 3. Image grows as large as it can while staying fully visible */
 .slide img {
   max-width: 100%;
   max-height: 100%;
   width: auto;
   height: auto;
-  object-fit: cover;   /* fills as much as possible without distortion */
+  object-fit: contain;
 }
-
         /* Title Slide */
         .slide.title-slide {
         background: linear-gradient(135deg, #001f3f 0%, #FFD700 100%);
