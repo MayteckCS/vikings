@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Marina Vikings Banquet Slideshow</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: #001f3f;
+            color: #ffffff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .slideshow-container {
+            position: relative;
+            max-width: 1000px;
+            width: 100%;
+            background: linear-gradient(135deg, #001f3f 0%, #003366 100%);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .slide {
+            display: none;
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background: #000000;
+            position: relative;
+        }
+
+        .slide.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .slide img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+            /* base transform reset so Ken Burns works predictably */
+            transform: scale(1) translate(0, 0);
+        }
+
+        /* Title Slide */
+        .slide.title-slide {
+            background: linear-gradient(135deg, #001f3f 0%, #FFD700 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+        }
+
+        .slide.title-slide h1 {
+            font-size: 4rem;
+            color: #ffffff;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .slide.title-slide .subtitle {
+            font-size: 2rem;
+            color: #001f3f;
+            text-shadow: 1px 1px 2px rgba(255, 255, 255, 0.5);
+        }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            z-index: 10;
+            background: rgba(0, 31, 63, 0.85);
+            padding: 15px 30px;
+            border-radius: 50px;
+        }
+
+        button {
+            background: #FFD700;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #001f3f;
+            transition: all 0.3s ease;
+        }
+
+        button:hover {
+            background: #FFA500;
+            transform: scale(1.05);
+        }
+
+        button:active {
+            transform: scale(0.95);
+        }
+
+        .play-pause-btn {
+            width: 50px;
+            height: 50px;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            font-size: 1.5rem;
+        }
+
+        .counter {
+            color: #FFD700;
+            font-weight: bold;
+            font-size: 1.1rem;
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            position: absolute;
+            bottom: 0;
+            left: 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #FFD700, #FFA500);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Info Section */
+        .info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 31, 63, 0.9);
+            padding: 15px 20px;
+            border-radius: 8px;
+            border-left: 4px solid #FFD700;
+            font-size: 0.9rem;
+        }
+
+        .info p {
+            margin: 5px 0;
+        }
+
+        /* Ken Burns variations */
+        .kenburns-zoom {
+            animation: kenburns-zoom 9000ms ease-in-out forwards;
+            transform-origin: center;
+        }
+
+        .kenburns-left {
+            animation: kenburns-left 9000ms ease-in-out forwards;
+            transform-origin: left center;
+        }
+
+        .kenburns-right {
+            animation: kenburns-right 9000ms ease-in-out forwards;
+            transform-origin: right center;
+        }
+
+        .kenburns-up {
+            animation: kenburns-up 9000ms ease-in-out forwards;
+            transform-origin: center top;
+        }
+
+        .kenburns-down {
+            animation: kenburns-down 9000ms ease-in-out forwards;
+            transform-origin: center bottom;
+        }
+
+        @keyframes kenburns-zoom {
+            0%   { transform: scale(1.05) translate(0, 0); }
+            100% { transform: scale(1.18) translate(0, 0); }
+        }
+
+        @keyframes kenburns-left {
+            0%   { transform: scale(1.1) translate(5%, 0); }
+            100% { transform: scale(1.2) translate(-5%, 0); }
+        }
+
+        @keyframes kenburns-right {
+            0%   { transform: scale(1.1) translate(-5%, 0); }
+            100% { transform: scale(1.2) translate(5%, 0); }
+        }
+
+        @keyframes kenburns-up {
+            0%   { transform: scale(1.1) translate(0, 5%); }
+            100% { transform: scale(1.2) translate(0, -5%); }
+        }
+
+        @keyframes kenburns-down {
+            0%   { transform: scale(1.1) translate(0, -5%); }
+            100% { transform: scale(1.2) translate(0, 5%); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .slide.title-slide h1 {
+                font-size: 2.5rem;
+            }
+
+            .slide.title-slide .subtitle {
+                font-size: 1.5rem;
+            }
+
+            .controls {
+                flex-wrap: wrap;
+                justify-content: center;
+                gap: 10px;
+                padding: 10px 15px;
+            }
+
+            button {
+                padding: 8px 16px;
+                font-size: 0.9rem;
+            }
+
+            .counter {
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="slideshow-container">
+        <!-- Title Slide -->
+        <div class="slide title-slide active">
+            <h1>MARINA VIKINGS</h1>
+            <p class="subtitle">Football Banquet 2025</p>
+        </div>
+
+        <!-- Photo slides will be injected via JavaScript -->
+
+        <!-- End Slide -->
+        <div class="slide" id="end-slide" style="background: linear-gradient(135deg, #001f3f 0%, #FFD700 100%); display: none; flex-direction: column; justify-content: center; align-items: center; text-align: center;">
+            <h2 style="font-size: 3rem; color: white; margin-bottom: 20px;">Thank You!</h2>
+            <p style="font-size: 1.5rem; color: #001f3f;">Go Vikings! 🏈</p>
+        </div>
+
+        <!-- Controls -->
+        <div class="controls">
+            <button class="play-pause-btn" title="Play/Pause">▶</button>
+            <button onclick="previousSlide()" title="Previous">← Back</button>
+            <span class="counter"><span id="current">1</span> / <span id="total">0</span></span>
+            <button onclick="nextSlide()" title="Next">Next →</button>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar">
+            <div class="progress-fill"></div>
+        </div>
+
+        <!-- Info Section -->
+        <div class="info">
+            <p><strong>Marina Vikings</strong></p>
+            <p>Navy Blue • Gold/Yellow • White</p>
+            <p id="timer">Auto-play: ON</p>
+        </div>
+    </div>
+
+    <script>
+        // IMAGE LIST (your existing images)
+        const imageFiles = [
+            "images/0.jpg",
+            "images/0(1).jpg",
+            "images/0(2).jpg",
+            "images/0(3).jpg",
+            "images/0(4).jpg",
+            "images/0(5).jpg",
+            "images/0(6).jpg",
+            "images/0(7).jpg",
+            "images/0(8).jpg",
+            "images/0(9).jpg",
+            "images/0(10).jpg",
+            "images/0(11).jpg",
+            "images/0(12).jpg",
+            "images/0(13).jpg",
+            "images/0(14).jpg",
+            "images/0(15).jpg",
+            "images/0(16).jpg",
+            "images/0(17).jpg",
+            "images/0(18).jpg",
+            "images/0(19).jpg",
+            "images/0(20).jpg",
+            "images/0(21).jpg",
+            "images/0(22).jpg",
+            "images/0(23).jpg",
+            "images/0(24).jpg",
+            "images/0(25).jpg",
+            "images/0(26).jpg",
+            "images/0(27).jpg",
+            "images/0(28).jpg",
+            "images/0(29).jpg",
+            "images/0(30).jpg",
+            "images/0(31).jpg",
+            "images/0(32).jpg",
+            "images/0(33).jpg",
+            "images/0(34).jpg",
+            "images/0(35).jpg",
+            "images/0(36).jpg",
+            "images/0(37).jpg",
+            "images/0(38).jpg",
+            "images/0(39).jpg",
+            "images/0(40).jpg",
+            "images/0(41).jpg",
+            "images/0(42).jpg",
+            "images/0(43).jpg",
+            "images/0(44).jpg",
+            "images/0(45).jpg",
+            "images/0(46).jpg",
+            "images/0(47).jpg",
+            "images/0(48).jpg",
+            "images/0(49).jpg",
+            "images/0(50).jpg",
+            "images/0(51).jpg",
+            "images/0(52).jpg",
+            "images/0(53).jpg",
+            "images/0(54).jpg",
+            "images/0(55).jpg",
+            "images/0(56).jpg",
+            "images/0(57).jpg",
+            "images/0(58).jpg",
+            "images/0(59).jpg",
+            "images/0(60).jpg",
+            "images/0(61).jpg",
+            "images/0(62).jpg",
+            "images/0(63).jpg",
+            "images/0(64).jpg",
+            "images/0(65).jpg",
+            "images/0(66).jpg",
+            "images/0(67).jpg",
+            "images/0(68).jpg",
+            "images/0(69).jpg",
+            "images/0(70).jpg",
+            "images/0(71).jpg",
+            "images/0(72).jpg",
+            "images/0(73).jpg",
+            "images/0(74).jpg",
+            "images/0(75).jpg",
+            "images/0(76).jpg",
+            "images/0(77).jpg",
+            "images/0(78).jpg",
+            "images/0(79).jpg",
+            "images/0(80).jpg",
+            "images/0(81).jpg",
+            "images/0(82).jpg",
+            "images/0(83).jpg",
+            "images/0(84).jpg",
+            "images/0(85).jpg",
+            "images/0(86).jpg",
+            "images/0(87).jpg",
+            "images/0(88).jpg",
+            "images/0(89).jpg",
+            "images/0(90).jpg",
+            "images/0(91).jpg",
+            "images/0(92).jpg",
+            "images/0(93).jpg",
+            "images/0(94).jpg",
+            "images/0(95).jpg",
+            "images/0(96).jpg",
+            "images/0(97).jpg",
+            "images/0(98).jpg",
+            "images/0(99).jpg",
+            "images/0(100).jpg",
+            "images/0(101).jpg",
+            "images/0(102).jpg",
+            "images/0(103).jpg",
+            "images/0(104).jpg",
+            "images/0(105).jpg",
+            "images/0(106).jpg",
+            "images/0(107).jpg",
+            "images/0(108).jpg",
+            "images/0(109).jpg",
+            "images/0(110).jpg",
+            "images/0(111).jpg",
+            "images/0(112).jpg",
+            "images/0(113).jpg",
+            "images/0(114).jpg",
+            "images/0(115).jpg",
+            "images/0(116).jpg",            
+            "images/0(117).jpg",
+            "images/0(118).jpg",
+            "images/0(119).jpg",
+            "images/unnamed.jpg",
+            "images/unnamed(1).jpg",
+            "images/unnamed(2).jpg",
+            "images/unnamed(3).jpg",
+            "images/unnamed(4).jpg",
+            "images/unnamed(5).jpg",
+            "images/unnamed(6).jpg",
+            "images/unnamed(7).jpg",
+            "images/unnamed(8).jpg",
+            "images/unnamed(9).jpg",
+            "images/unnamed(10).jpg",
+            "images/unnamed(11).jpg",
+            "images/unnamed(12).jpg",
+            "images/unnamed(13).jpg",
+            "images/unnamed(14).jpg",
+            "images/unnamed(15).jpg",
+            "images/unnamed(16).jpg",
+            "images/unnamed(17).jpg",
+            "images/unnamed(18).jpg",
+            "images/unnamed(19).jpg",
+            "images/unnamed(20).jpg",
+            "images/unnamed(21).jpg",
+            "images/unnamed(22).jpg",
+            "images/unnamed(23).jpg",
+            "images/unnamed(24).jpg",
+            "images/unnamed(25).jpg",
+            "images/unnamed(26).jpg",
+            "images/unnamed(27).jpg",
+            "images/unnamed(28).jpg",
+            "images/unnamed(29).jpg",
+            "images/unnamed(30).jpg"
+        ];
+
+        // Shuffle for random order
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        shuffleArray(imageFiles);
+
+        let currentSlide = 0; // index into all slides (title + photos + end)
+        let isPlaying = true;
+        let autoPlayInterval;
+        const autoPlaySpeed = 9000; // 9 seconds per slide
+
+        // Ken Burns classes
+        const kenBurnsClasses = [
+            "kenburns-zoom",
+            "kenburns-left",
+            "kenburns-right",
+            "kenburns-up",
+            "kenburns-down"
+        ];
+
+        function applyRandomKenBurns(imgEl) {
+            kenBurnsClasses.forEach(cls => imgEl.classList.remove(cls));
+            const randomClass = kenBurnsClasses[Math.floor(Math.random() * kenBurnsClasses.length)];
+            imgEl.classList.add(randomClass);
+        }
+
+        // Build slides dynamically (title + images + end)
+        function buildSlides() {
+            const container = document.querySelector('.slideshow-container');
+            const endSlide = document.getElementById('end-slide');
+
+            // Insert image slides before end slide
+            imageFiles.forEach(src => {
+                const slide = document.createElement('div');
+                slide.className = 'slide';
+                const img = document.createElement('img');
+                img.src = src;
+                slide.appendChild(img);
+                container.insertBefore(slide, endSlide);
+            });
+
+            // Update total counter (all slides)
+            const totalSlides = document.querySelectorAll('.slide').length;
+            document.getElementById('total').textContent = totalSlides;
+        }
+
+        function showSlide(n) {
+            const slides = document.querySelectorAll('.slide');
+
+            if (n >= slides.length) {
+                currentSlide = 0;
+            } else if (n < 0) {
+                currentSlide = slides.length - 1;
+            } else {
+                currentSlide = n;
+            }
+
+            // Hide all slides
+            slides.forEach(slide => slide.classList.remove('active'));
+
+            // Show current slide
+            const activeSlide = slides[currentSlide];
+            activeSlide.classList.add('active');
+
+            // If this slide has an image, apply random Ken Burns
+            const img = activeSlide.querySelector('img');
+            if (img) {
+                applyRandomKenBurns(img);
+            }
+
+            // Update counter
+            document.getElementById('current').textContent = currentSlide + 1;
+
+            // Update progress bar
+            const progress = ((currentSlide + 1) / slides.length) * 100;
+            document.querySelector('.progress-fill').style.width = progress + '%';
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+            resetAutoPlay();
+        }
+
+        function previousSlide() {
+            showSlide(currentSlide - 1);
+            resetAutoPlay();
+        }
+
+        function startAutoPlay() {
+            if (!isPlaying) return;
+            autoPlayInterval = setInterval(() => {
+                showSlide(currentSlide + 1);
+            }, autoPlaySpeed);
+        }
+
+        function stopAutoPlay() {
+            clearInterval(autoPlayInterval);
+        }
+
+        function resetAutoPlay() {
+            stopAutoPlay();
+            startAutoPlay();
+        }
+
+        function toggleAutoPlay() {
+            isPlaying = !isPlaying;
+            const btn = document.querySelector('.play-pause-btn');
+            const timer = document.getElementById('timer');
+
+            if (isPlaying) {
+                btn.textContent = '⏸';
+                timer.textContent = 'Auto-play: ON';
+                startAutoPlay();
+            } else {
+                btn.textContent = '▶';
+                timer.textContent = 'Auto-play: OFF';
+                stopAutoPlay();
+            }
+        }
+
+        function setupPlayButton() {
+            const btn = document.querySelector('.play-pause-btn');
+            btn.textContent = '⏸';
+            btn.addEventListener('click', toggleAutoPlay);
+        }
+
+        // Initialize
+        function init() {
+            buildSlides();
+            setupPlayButton();
+            showSlide(0);
+            startAutoPlay();
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') previousSlide();
+            if (e.key === ' ') {
+                e.preventDefault();
+                toggleAutoPlay();
+            }
+        });
+
+        // Full-screen on double click
+        document.querySelector('.slideshow-container').addEventListener('dblclick', () => {
+            if (document.fullscreenElement) {
+                document.exitFullscreen();
+            } else {
+                document.querySelector('.slideshow-container').requestFullscreen().catch(() => {});
+            }
+        });
+
+        // Start the slideshow
+        init();
+    </script>
+</body>
+</html>
