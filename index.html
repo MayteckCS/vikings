@@ -65,63 +65,57 @@
       font-size: 0.8rem;
       color: #d0d4ff;
     }
-    .brand {
-      text-align: right;
-      font-size: 0.7rem;
-      color: #aaaaaa;
-    }
-    .brand a {
-      color: var(--powder);
-      text-decoration: none;
-    }
-    .brand a:hover {
-      text-decoration: underline;
-    }
-
     .viewport {
       position: relative;
       width: 100%;
       aspect-ratio: 16 / 9;
-      background: radial-gradient(circle at center, #123 0, #000 60%);
+      background: #000;
       border-radius: 14px;
-      /* CRITICAL: This keeps the zoomed image inside the box */
-      overflow: hidden; 
+      overflow: hidden;
       border: 1px solid rgba(255, 255, 255, 0.08);
+      /* Centers the main image */
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    .slide-image {
+    /* --- BACKGROUND LAYER (Blurred) --- */
+    .slide-background {
+      position: absolute;
+      top: 0;
+      left: 0;
       width: 100%;
       height: 100%;
-      /* CHANGED: 'cover' makes images fill the screen (no black bars). 
-         Switch back to 'contain' if you prefer seeing the whole photo with black bars. */
-      object-fit: cover; 
-      background: #000;
-      display: none;
-      /* Prepare for animation performance */
+      object-fit: cover; /* Forces bg to fill screen */
+      filter: blur(20px) brightness(0.4); /* Blur and darken */
+      z-index: 0;
+      transform: scale(1.1); /* Scale up slightly to hide blur edges */
+    }
+
+    /* --- FOREGROUND LAYER (Sharp & Moving) --- */
+    .slide-image {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+      /* FIX: 'contain' ensures we see the WHOLE photo, no matter the size */
+      object-fit: contain; 
+      
+      /* Prepare for animation */
       will-change: transform;
-      transform-origin: center center;
+      opacity: 0; /* Start hidden for fade-in */
+      transition: opacity 0.5s ease;
     }
 
     .slide-image.active {
-      display: block;
-      /* KEN BURNS ANIMATION APPLIED HERE */
+      opacity: 1;
+      /* KEN BURNS ANIMATION */
       animation: kenburns 15s ease-out infinite alternate;
     }
 
-    /* THE ANIMATION DEFINITION */
     @keyframes kenburns {
-      0% {
-        transform: scale(1) translate(0, 0);
-        opacity: 0.8; /* Starts slightly dim for effect */
-      }
-      20% {
-        opacity: 1; 
-      }
-      100% {
-        /* Zoom to 115% and move slightly left/up */
-        transform: scale(1.15) translate(-2%, -2%); 
-        opacity: 1;
-      }
+      0% { transform: scale(1) translate(0, 0); }
+      100% { transform: scale(1.10) translate(0, 0); } /* Gentle 10% zoom */
     }
 
     .overlay {
@@ -132,58 +126,17 @@
       justify-content: space-between;
       align-items: flex-end;
       padding: 10px;
-      background: linear-gradient(
-        to top,
-        rgba(0, 0, 0, 0.6) 0%,
-        rgba(0, 0, 0, 0.0) 40%
-      );
-      /* Ensure text sits on top of the zoomed image */
-      z-index: 2; 
+      z-index: 2; /* Text sits on top of everything */
+      background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.0) 40%);
     }
-    .overlay-left {
-      pointer-events: auto;
-      display: flex;
-      flex-direction: column;
-      gap: 4px;
-    }
-    .overlay-right {
-      pointer-events: auto;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 4px;
-    }
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-      padding: 3px 8px;
-      border-radius: 999px;
-      background: rgba(0, 0, 0, 0.75);
-      border: 1px solid rgba(249, 200, 14, 0.6);
-      font-size: 0.7rem;
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      color: #fefefe;
-    }
-    .team-colors {
-      display: flex;
-      gap: 3px;
-    }
-    .color-dot {
-      width: 8px;
-      height: 8px;
-      border-radius: 999px;
-      border: 1px solid #000;
-    }
-    .color-navy { background: var(--navy); }
-    .color-gold { background: var(--gold); }
-    .color-white { background: var(--white); }
-    .color-powder { background: var(--powder); }
 
-    .slide-label {
-      display: none;
+    .overlay-left, .overlay-right {
+      pointer-events: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
     }
+    .overlay-right { align-items: flex-end; }
 
     .controls {
       display: flex;
@@ -192,8 +145,7 @@
       gap: 10px;
       padding: 6px 4px 0;
     }
-    .controls-left,
-    .controls-right {
+    .controls-left, .controls-right {
       display: flex;
       align-items: center;
       gap: 6px;
@@ -219,17 +171,9 @@
       font-weight: 600;
       border-color: rgba(0, 0, 0, 0.5);
     }
-    button.icon {
-      padding-inline: 8px;
-      min-width: 30px;
-      justify-content: center;
-    }
-    button:hover {
-      background-color: rgba(255, 255, 255, 0.12);
-    }
-    button.primary:hover {
-      filter: brightness(1.05);
-    }
+    button.icon { padding-inline: 8px; min-width: 30px; justify-content: center; }
+    button:hover { background-color: rgba(255, 255, 255, 0.12); }
+    button.primary:hover { filter: brightness(1.05); }
 
     .status {
       font-size: 0.75rem;
@@ -245,7 +189,6 @@
       background: #24d36b;
       box-shadow: 0 0 8px #24d36b;
     }
-
     .progress-bar-container {
       flex: 1;
       height: 4px;
@@ -259,33 +202,19 @@
       background: linear-gradient(90deg, var(--gold), var(--powder));
       transition: width 0.25s linear;
     }
-
     .helper-text {
       margin-top: 4px;
       font-size: 0.7rem;
       color: #9aa0ff;
       text-align: center;
     }
+    .slide-label { font-size: 0.9rem; font-weight: 500; text-shadow: 0 1px 4px rgba(0,0,0,0.8); }
 
     @media (max-width: 768px) {
-      .frame {
-        padding: 10px;
-      }
-      header {
-        flex-direction: column;
-        align-items: flex-start;
-      }
-      .brand {
-        align-self: flex-end;
-      }
-      .controls {
-        flex-direction: column;
-        align-items: stretch;
-      }
-      .controls-left,
-      .controls-right {
-        justify-content: space-between;
-      }
+      .frame { padding: 10px; }
+      header { flex-direction: column; align-items: flex-start; }
+      .controls { flex-direction: column; align-items: stretch; }
+      .controls-left, .controls-right { justify-content: space-between; }
     }
   </style>
 </head>
@@ -299,10 +228,13 @@
     </header>
 
     <div class="viewport" id="slideshow">
+      <img id="slideBackground" class="slide-background" src="" alt="" />
+      
       <img id="slideImage" class="slide-image active" src="" alt="Marina Vikings photo" />
+      
       <div class="overlay">
         <div class="overlay-left">
-          <div class="slide-label" id="slideLabel">Loading photos…</div>
+          <div class="slide-label" id="slideLabel">Loading...</div>
         </div>
         <div class="overlay-right">
           <div class="status">
@@ -336,173 +268,171 @@
   </div>
 
   <script>
-    // 1) LIST YOUR IMAGE FILES HERE (from /images folder)
+    // 1) LIST YOUR IMAGE FILES HERE
     const imageFiles = [
-  "images/0.jpg",
-  "images/0(1).jpg",
-  "images/0(2).jpg",
-  "images/0(3).jpg",
-  "images/0(4).jpg",
-  "images/0(5).jpg",
-  "images/0(6).jpg",
-  "images/0(7).jpg",
-  "images/0(8).jpg",
-  "images/0(9).jpg",
-  "images/0(10).jpg",
-  "images/0(11).jpg",
-  "images/0(12).jpg",
-  "images/0(13).jpg",
-  "images/0(14).jpg",
-  "images/0(15).jpg",
-  "images/0(16).jpg",
-  "images/0(17).jpg",
-  "images/0(18).jpg",
-  "images/0(19).jpg",
-  "images/0(20).jpg",
-  "images/0(21).jpg",
-  "images/0(22).jpg",
-  "images/0(23).jpg",
-  "images/0(24).jpg",
-  "images/0(25).jpg",
-  "images/0(26).jpg",
-  "images/0(27).jpg",
-  "images/0(28).jpg",
-  "images/0(29).jpg",
-  "images/0(30).jpg",
-  "images/0(31).jpg",
-  "images/0(32).jpg",
-  "images/0(33).jpg",
-  "images/0(34).jpg",
-  "images/0(35).jpg",
-  "images/0(36).jpg",
-  "images/0(37).jpg",
-  "images/0(38).jpg",
-  "images/0(39).jpg",
-  "images/0(40).jpg",
-  "images/0(41).jpg",
-  "images/0(42).jpg",
-  "images/0(43).jpg",
-  "images/0(44).jpg",
-  "images/0(45).jpg",
-  "images/0(46).jpg",
-  "images/0(47).jpg",
-  "images/0(48).jpg",
-  "images/0(49).jpg",
-  "images/0(50).jpg",
-  "images/0(51).jpg",
-  "images/0(52).jpg",
-  "images/0(53).jpg",
-  "images/0(54).jpg",
-  "images/0(55).jpg",
-  "images/0(56).jpg",
-  "images/0(57).jpg",
-  "images/0(58).jpg",
-  "images/0(59).jpg",
-  "images/0(60).jpg",
-  "images/0(61).jpg",
-  "images/0(62).jpg",
-  "images/0(63).jpg",
-  "images/0(64).jpg",
-  "images/0(65).jpg",
-  "images/0(66).jpg",
-  "images/0(67).jpg",
-  "images/0(68).jpg",
-  "images/0(69).jpg",
-  "images/0(70).jpg",
-  "images/0(71).jpg",
-  "images/0(72).jpg",
-  "images/0(73).jpg",
-  "images/0(74).jpg",
-  "images/0(75).jpg",
-  "images/0(76).jpg",
-  "images/0(77).jpg",
-  "images/0(78).jpg",
-  "images/0(79).jpg",
-  "images/0(80).jpg",
-  "images/0(81).jpg",
-  "images/0(82).jpg",
-  "images/0(83).jpg",
-  "images/0(84).jpg",
-  "images/0(85).jpg",
-  "images/0(86).jpg",
-  "images/0(87).jpg",
-  "images/0(88).jpg",
-  "images/0(89).jpg",
-  "images/0(90).jpg",
-  "images/0(91).jpg",
-  "images/0(92).jpg",
-  "images/0(93).jpg",
-  "images/0(94).jpg",
-  "images/0(95).jpg",
-  "images/0(96).jpg",
-  "images/0(97).jpg",
-  "images/0(98).jpg",
-  "images/0(99).jpg",
-  "images/0(100).jpg",
-  "images/0(101).jpg",
-  "images/0(102).jpg",
-  "images/0(103).jpg",
-  "images/0(104).jpg",
-  "images/0(105).jpg",
-  "images/0(106).jpg",
-  "images/0(107).jpg",
-  "images/0(108).jpg",
-  "images/0(109).jpg",
-  "images/0(110).jpg",
-  "images/0(111).jpg",
-  "images/0(112).jpg",
-  "images/0(113).jpg",
-  "images/0(114).jpg",
-  "images/0(115).jpg",
-  "images/0(116).jpg",  
-  "images/0(117).jpg",
-  "images/0(118).jpg",
-  "images/0(119).jpg",
-  "images/unnamed.jpg",
-  "images/unnamed(1).jpg",
-  "images/unnamed(2).jpg",
-  "images/unnamed(3).jpg",
-  "images/unnamed(4).jpg",
-  "images/unnamed(5).jpg",
-  "images/unnamed(6).jpg",
-  "images/unnamed(7).jpg",
-  "images/unnamed(8).jpg",
-  "images/unnamed(9).jpg",
-  "images/unnamed(10).jpg",
-  "images/unnamed(11).jpg",
-  "images/unnamed(12).jpg",
-  "images/unnamed(13).jpg",
-  "images/unnamed(14).jpg",
-  "images/unnamed(15).jpg",
-  "images/unnamed(16).jpg",
-  "images/unnamed(17).jpg",
-  "images/unnamed(18).jpg",
-  "images/unnamed(19).jpg",
-  "images/unnamed(20).jpg",
-  "images/unnamed(21).jpg",
-  "images/unnamed(22).jpg",
-  "images/unnamed(23).jpg",
-  "images/unnamed(24).jpg",
-  "images/unnamed(25).jpg",
-  "images/unnamed(26).jpg",
-  "images/unnamed(27).jpg",
-  "images/unnamed(28).jpg"
-];
+      "images/0.jpg",
+      "images/0(1).jpg",
+      "images/0(2).jpg",
+      "images/0(3).jpg",
+      "images/0(4).jpg",
+      "images/0(5).jpg",
+      "images/0(6).jpg",
+      "images/0(7).jpg",
+      "images/0(8).jpg",
+      "images/0(9).jpg",
+      "images/0(10).jpg",
+      "images/0(11).jpg",
+      "images/0(12).jpg",
+      "images/0(13).jpg",
+      "images/0(14).jpg",
+      "images/0(15).jpg",
+      "images/0(16).jpg",
+      "images/0(17).jpg",
+      "images/0(18).jpg",
+      "images/0(19).jpg",
+      "images/0(20).jpg",
+      "images/0(21).jpg",
+      "images/0(22).jpg",
+      "images/0(23).jpg",
+      "images/0(24).jpg",
+      "images/0(25).jpg",
+      "images/0(26).jpg",
+      "images/0(27).jpg",
+      "images/0(28).jpg",
+      "images/0(29).jpg",
+      "images/0(30).jpg",
+      "images/0(31).jpg",
+      "images/0(32).jpg",
+      "images/0(33).jpg",
+      "images/0(34).jpg",
+      "images/0(35).jpg",
+      "images/0(36).jpg",
+      "images/0(37).jpg",
+      "images/0(38).jpg",
+      "images/0(39).jpg",
+      "images/0(40).jpg",
+      "images/0(41).jpg",
+      "images/0(42).jpg",
+      "images/0(43).jpg",
+      "images/0(44).jpg",
+      "images/0(45).jpg",
+      "images/0(46).jpg",
+      "images/0(47).jpg",
+      "images/0(48).jpg",
+      "images/0(49).jpg",
+      "images/0(50).jpg",
+      "images/0(51).jpg",
+      "images/0(52).jpg",
+      "images/0(53).jpg",
+      "images/0(54).jpg",
+      "images/0(55).jpg",
+      "images/0(56).jpg",
+      "images/0(57).jpg",
+      "images/0(58).jpg",
+      "images/0(59).jpg",
+      "images/0(60).jpg",
+      "images/0(61).jpg",
+      "images/0(62).jpg",
+      "images/0(63).jpg",
+      "images/0(64).jpg",
+      "images/0(65).jpg",
+      "images/0(66).jpg",
+      "images/0(67).jpg",
+      "images/0(68).jpg",
+      "images/0(69).jpg",
+      "images/0(70).jpg",
+      "images/0(71).jpg",
+      "images/0(72).jpg",
+      "images/0(73).jpg",
+      "images/0(74).jpg",
+      "images/0(75).jpg",
+      "images/0(76).jpg",
+      "images/0(77).jpg",
+      "images/0(78).jpg",
+      "images/0(79).jpg",
+      "images/0(80).jpg",
+      "images/0(81).jpg",
+      "images/0(82).jpg",
+      "images/0(83).jpg",
+      "images/0(84).jpg",
+      "images/0(85).jpg",
+      "images/0(86).jpg",
+      "images/0(87).jpg",
+      "images/0(88).jpg",
+      "images/0(89).jpg",
+      "images/0(90).jpg",
+      "images/0(91).jpg",
+      "images/0(92).jpg",
+      "images/0(93).jpg",
+      "images/0(94).jpg",
+      "images/0(95).jpg",
+      "images/0(96).jpg",
+      "images/0(97).jpg",
+      "images/0(98).jpg",
+      "images/0(99).jpg",
+      "images/0(100).jpg",
+      "images/0(101).jpg",
+      "images/0(102).jpg",
+      "images/0(103).jpg",
+      "images/0(104).jpg",
+      "images/0(105).jpg",
+      "images/0(106).jpg",
+      "images/0(107).jpg",
+      "images/0(108).jpg",
+      "images/0(109).jpg",
+      "images/0(110).jpg",
+      "images/0(111).jpg",
+      "images/0(112).jpg",
+      "images/0(113).jpg",
+      "images/0(114).jpg",
+      "images/0(115).jpg",
+      "images/0(116).jpg",  
+      "images/0(117).jpg",
+      "images/0(118).jpg",
+      "images/0(119).jpg",
+      "images/unnamed.jpg",
+      "images/unnamed(1).jpg",
+      "images/unnamed(2).jpg",
+      "images/unnamed(3).jpg",
+      "images/unnamed(4).jpg",
+      "images/unnamed(5).jpg",
+      "images/unnamed(6).jpg",
+      "images/unnamed(7).jpg",
+      "images/unnamed(8).jpg",
+      "images/unnamed(9).jpg",
+      "images/unnamed(10).jpg",
+      "images/unnamed(11).jpg",
+      "images/unnamed(12).jpg",
+      "images/unnamed(13).jpg",
+      "images/unnamed(14).jpg",
+      "images/unnamed(15).jpg",
+      "images/unnamed(16).jpg",
+      "images/unnamed(17).jpg",
+      "images/unnamed(18).jpg",
+      "images/unnamed(19).jpg",
+      "images/unnamed(20).jpg",
+      "images/unnamed(21).jpg",
+      "images/unnamed(22).jpg",
+      "images/unnamed(23).jpg",
+      "images/unnamed(24).jpg",
+      "images/unnamed(25).jpg",
+      "images/unnamed(26).jpg",
+      "images/unnamed(27).jpg",
+      "images/unnamed(28).jpg"
+    ];
 
-   // Shuffle array function (Fisher-Yates)
-function shuffleArray(array) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [array[i], array[j]] = [array[j], array[i]];
-  }
-  return array;
-}
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
 
-// Shuffle the images
-shuffleArray(imageFiles); 
+    shuffleArray(imageFiles); 
 
-    // 2) Slideshow logic
     const slideImage = document.getElementById("slideImage");
+    const slideBackground = document.getElementById("slideBackground");
     const slideLabel = document.getElementById("slideLabel");
     const playPauseBtn = document.getElementById("playPauseBtn");
     const playPauseIcon = document.getElementById("playPauseIcon");
@@ -517,7 +447,7 @@ shuffleArray(imageFiles);
 
     let currentIndex = 0;
     let isPlaying = true;
-    const slideDurationMs = 5000; // Adjusted to 5 seconds for better pace
+    const slideDurationMs = 5000;
     let intervalId = null;
 
     function extractNiceName(path) {
@@ -531,20 +461,20 @@ shuffleArray(imageFiles);
 
       if (imageFiles.length === 0) {
         slideImage.src = "";
-        slideLabel.textContent = "No photos found – please add filenames in index.html.";
-        counter.textContent = "0 / 0";
-        progressBar.style.width = "0%";
         return;
       }
 
       const src = imageFiles[safeIndex];
-      slideImage.src = src;
       
-      // RESET ANIMATION TRICK
-      // This forces the browser to restart the Ken Burns CSS animation from 0%
+      // Update Foreground
+      slideImage.src = src;
+      // Restart Animation
       slideImage.classList.remove("active");
-      void slideImage.offsetWidth; // Trigger reflow
+      void slideImage.offsetWidth; 
       slideImage.classList.add("active");
+
+      // Update Background
+      slideBackground.src = src;
 
       slideLabel.textContent = extractNiceName(src);
       counter.textContent = (safeIndex + 1) + " / " + total;
@@ -590,41 +520,20 @@ shuffleArray(imageFiles);
     }
 
     playPauseBtn.addEventListener("click", togglePlayPause);
-    nextBtn.addEventListener("click", () => {
-      isPlaying = false;
-      updateUI();
-      nextSlide();
-    });
-    prevBtn.addEventListener("click", () => {
-      isPlaying = false;
-      updateUI();
-      prevSlide();
-    });
+    nextBtn.addEventListener("click", () => { isPlaying = false; updateUI(); nextSlide(); });
+    prevBtn.addEventListener("click", () => { isPlaying = false; updateUI(); prevSlide(); });
 
     document.addEventListener("keydown", (e) => {
-      if (e.code === "Space") {
-        e.preventDefault();
-        togglePlayPause();
-      } else if (e.key === "ArrowRight") {
-        isPlaying = false;
-        updateUI();
-        nextSlide();
-      } else if (e.key === "ArrowLeft") {
-        isPlaying = false;
-        updateUI();
-        prevSlide();
-      }
+      if (e.code === "Space") { e.preventDefault(); togglePlayPause(); }
+      else if (e.key === "ArrowRight") { isPlaying = false; updateUI(); nextSlide(); }
+      else if (e.key === "ArrowLeft") { isPlaying = false; updateUI(); prevSlide(); }
     });
 
     viewport.addEventListener("dblclick", () => {
-      if (!document.fullscreenElement) {
-        viewport.requestFullscreen().catch(() => {});
-      } else {
-        document.exitFullscreen().catch(() => {});
-      }
+      if (!document.fullscreenElement) viewport.requestFullscreen().catch(() => {});
+      else document.exitFullscreen().catch(() => {});
     });
 
-    // init
     updateUI();
     startAutoPlay();
   </script>
