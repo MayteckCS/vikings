@@ -106,7 +106,6 @@
       inset: 0;
       pointer-events: none;
       display: flex;
-      /* Changed to flex-end so the status text stays on the right */
       justify-content: flex-end; 
       align-items: flex-end;
       padding: 15px;
@@ -182,7 +181,10 @@
 
 <script>
 // --- CONFIGURATION ---
-const slideDuration = 4000; // 4 seconds per slide
+const defaultDuration = 8000;   // 8 seconds per standard slide
+const specialDuration = 20000;  // 20 seconds for the first slide (_001)
+const specialImage = "images/_001.png"; // This image will stay first and loop
+
 const imageFiles = [
   "images/_001.png",
   "images/0.jpg",
@@ -364,16 +366,24 @@ let currentIndex = 0;
 let isPlaying = true;
 let timer = null;
 
-// Shuffle
+// 1. Remove the special image from the list if it exists (so we don't shuffle it)
+const specialIndex = imageFiles.indexOf(specialImage);
+if (specialIndex > -1) {
+  imageFiles.splice(specialIndex, 1);
+}
+
+// 2. Shuffle the remaining images
 for (let i = imageFiles.length - 1; i > 0; i--) {
   const j = Math.floor(Math.random() * (i + 1));
   [imageFiles[i], imageFiles[j]] = [imageFiles[j], imageFiles[i]];
 }
 
+// 3. Add the special image to the very start (Index 0)
+imageFiles.unshift(specialImage);
+
 // Elements
 const bgLayer = document.getElementById("bgLayer");
 const fgLayer = document.getElementById("fgLayer");
-// const slideName removed
 const progressBar = document.getElementById("progressBar");
 const counter = document.getElementById("counter");
 const playStatus = document.getElementById("playStatus");
@@ -382,7 +392,7 @@ const btnPause = document.getElementById("btnPause");
 function showSlide(index) {
   if (!imageFiles.length) return;
   
-  // Wrap index
+  // Wrap index for looping
   if (index >= imageFiles.length) currentIndex = 0;
   else if (index < 0) currentIndex = imageFiles.length - 1;
   else currentIndex = index;
@@ -396,35 +406,47 @@ function showSlide(index) {
   fgLayer.classList.remove("active");
   fgLayer.src = src;
   
-  // Small delay to allow browser to register the class removal (reflow)
-  // This ensures the animation restarts from the beginning every time
-  void fgLayer.offsetWidth; 
+  void fgLayer.offsetWidth; // Trigger reflow
   fgLayer.classList.add("active");
 
-  // 3. Update Text (REMOVED NAME LOGIC)
+  // 3. Update Text
   counter.innerText = (currentIndex + 1) + " / " + imageFiles.length;
   progressBar.style.width = ((currentIndex + 1) / imageFiles.length * 100) + "%";
 }
 
 function nextSlide() {
   showSlide(currentIndex + 1);
+  // If playing, immediately queue the NEXT slide timer
+  if (isPlaying) queueNext();
 }
 
 function prevSlide() {
   showSlide(currentIndex - 1);
-  stopAutoplay(); // Manual interaction stops autoplay
+  stopAutoplay();
+}
+
+// Schedules the next slide based on the CURRENT slide's required duration
+function queueNext() {
+  if (timer) clearTimeout(timer);
+  
+  // Determine how long to wait on the current slide
+  // If current slide is our special image (_001), wait 20s. Otherwise wait 8s.
+  const currentSrc = imageFiles[currentIndex];
+  const delay = currentSrc.includes("_001.png") ? specialDuration : defaultDuration;
+  
+  timer = setTimeout(nextSlide, delay);
 }
 
 function startAutoplay() {
-  if (timer) clearInterval(timer);
+  if (timer) clearTimeout(timer);
   isPlaying = true;
   btnPause.innerText = "Pause";
   playStatus.innerText = "▶ Autoplay ON";
-  timer = setInterval(nextSlide, slideDuration);
+  queueNext(); // Start the timer loop
 }
 
 function stopAutoplay() {
-  if (timer) clearInterval(timer);
+  if (timer) clearTimeout(timer);
   isPlaying = false;
   btnPause.innerText = "Play";
   playStatus.innerText = "⏸ Paused";
@@ -433,7 +455,7 @@ function stopAutoplay() {
 function togglePlay() {
   if (isPlaying) stopAutoplay();
   else {
-    nextSlide(); // Move immediately
+    nextSlide(); // Move immediately on click
     startAutoplay();
   }
 }
