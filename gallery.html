@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Marina Vikings Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon.png">
+  <style>
+    :root {
+      --navy: #001f3f;
+      --gold: #f9c80e;
+      --white: #ffffff;
+      --powder: #9fc5f8;
+      --bg: #020814;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at top, #0a1a3a 0, #020814 50%, #000000 100%);
+      color: var(--white);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .frame {
+      max-width: 1200px;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 18px;
+      border: 2px solid var(--gold);
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 80vh; /* Make sure it looks substantial */
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(249, 200, 14, 0.3);
+    }
+    
+    .title-block h1 { color: var(--gold); font-size: 1.4rem; letter-spacing: 0.1em; text-transform: uppercase; }
+    .subtitle { font-size: 0.9rem; color: #d0d4ff; }
+    
+    .nav-link {
+        color: var(--powder);
+        text-decoration: none;
+        font-size: 0.9rem;
+        border: 1px solid rgba(255,255,255,0.2);
+        padding: 5px 12px;
+        border-radius: 20px;
+        transition: all 0.2s;
+    }
+    .nav-link:hover { background: var(--gold); color: #000; border-color: var(--gold); }
+
+    /* --- GALLERY GRID --- */
+    .gallery-grid {
+      display: grid;
+      /* Auto-fill creates as many columns as fit */
+      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+      gap: 20px;
+      width: 100%;
+    }
+
+    .gallery-item {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 10px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.2s, border-color 0.2s;
+    }
+
+    .gallery-item:hover {
+      transform: translateY(-3px);
+      border-color: var(--gold);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+    }
+
+    /* The visual preview area */
+    .preview-box {
+      width: 100%;
+      height: 180px;
+      background: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .preview-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Shows whole image */
+    }
+
+    /* Special styling for PDF placeholders */
+    .pdf-placeholder {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: var(--powder);
+      font-weight: bold;
+    }
+    .pdf-icon {
+        font-size: 3rem;
+        margin-bottom: 5px;
+        border: 2px solid var(--powder);
+        border-radius: 5px;
+        padding: 5px 10px;
+    }
+
+    /* Content area below image */
+    .item-info {
+      padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      flex-grow: 1;
+      justify-content: space-between;
+    }
+
+    .filename {
+      font-size: 0.8rem;
+      color: #ccc;
+      word-break: break-word; /* Prevent long names from breaking layout */
+      margin-bottom: 5px;
+    }
+
+    .download-btn {
+      cursor: pointer;
+      background: var(--gold);
+      color: #000;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      text-decoration: none;
+      font-size: 0.85rem;
+      transition: filter 0.2s;
+      display: block; /* fills width */
+    }
+    .download-btn:hover { filter: brightness(1.1); }
+
+  </style>
+</head>
+<body>
+
+  <div class="frame">
+    <header>
+      <div class="title-block">
+        <h1>Marina Vikings</h1>
+        <div class="subtitle">Banquet Asset Gallery</div>
+      </div>
+      <a href="index.html" class="nav-link">← Back to Slideshow</a>
+    </header>
+
+    <div class="gallery-grid" id="galleryGrid">
+      </div>
+  </div>
+
+<script>
+// --- CONFIGURATION ---
+// I extracted these filenames from your screenshot
+const galleryPath = "images/gallery/"; 
+const fileList = [
+  "10x8 - VIKINGS block.png",
+  "8x10 - Football.png",
+  "8x10 - M-logo-blue.png",
+  "8x10 - M-logo.png",
+  "8x10 - helmet RIGHT.png",
+  "8x10 - helmet.png",
+  "8x10 - mascot RIGHT.png",
+  "8x10 - mascot.png",
+  "FINAL Banquet Cake Design - M-logo-blue.pdf",
+  "FINAL Banquet Cake Design - M-logo-noblue.pdf"
+];
+
+const grid = document.getElementById("galleryGrid");
+
+fileList.forEach(filename => {
+    // 1. Create the card container
+    const card = document.createElement("div");
+    card.className = "gallery-item";
+
+    // 2. Determine file type
+    const isPdf = filename.toLowerCase().endsWith(".pdf");
+    const fullPath = galleryPath + filename;
+
+    // 3. Create Preview Content
+    let previewHTML = "";
+    if (isPdf) {
+        // Since we can't easily display a PDF in an <img> tag, we show a document icon
+        previewHTML = `
+            <div class="pdf-placeholder">
+                <div class="pdf-icon">PDF</div>
+                <div style="font-size:0.7rem; opacity:0.7">Document</div>
+            </div>
+        `;
+    } else {
+        // Standard Image
+        previewHTML = `<img src="${fullPath}" alt="${filename}" loading="lazy">`;
+    }
+
+    // 4. Build the HTML structure
+    card.innerHTML = `
+        <div class="preview-box">
+            ${previewHTML}
+        </div>
+        <div class="item-info">
+            <div class="filename">${filename}</div>
+            <a href="${fullPath}" download="${filename}" class="download-btn">
+                Download
+            </a>
+        </div>
+    `;
+
+    // 5. Add to grid
+    grid.appendChild(card);
+});
+
+</script>
+</body>
+</html>
