@@ -182,11 +182,11 @@
 <script>
 // --- CONFIGURATION ---
 const defaultDuration = 8000;   // 8 seconds per standard slide
-const specialDuration = 20000;  // 20 seconds for the first slide (_001)
-const specialImage = "images/_001.png"; // This image will stay first and loop
+const specialDuration = 20000;  // 20 seconds for the first slide (start.png)
+const specialImage = "images/start.png"; // UPDATED: Changed from _001.png to start.png
 
 const imageFiles = [
-  "images/_001.png",
+  "images/start.png", // UPDATED: Changed from _001.png to start.png
   "images/0.jpg",
   "images/0(1).jpg",
   "images/0(2).jpg",
@@ -430,9 +430,11 @@ function queueNext() {
   if (timer) clearTimeout(timer);
   
   // Determine how long to wait on the current slide
-  // If current slide is our special image (_001), wait 20s. Otherwise wait 8s.
+  // If current slide is our special image (start.png), wait 20s. Otherwise wait 8s.
   const currentSrc = imageFiles[currentIndex];
-  const delay = currentSrc.includes("_001.png") ? specialDuration : defaultDuration;
+  
+  // UPDATED: Check for start.png instead of _001.png
+  const delay = currentSrc.includes("start.png") ? specialDuration : defaultDuration;
   
   timer = setTimeout(nextSlide, delay);
 }
