@@ -106,7 +106,8 @@
       inset: 0;
       pointer-events: none;
       display: flex;
-      justify-content: space-between;
+      /* Changed to flex-end so the status text stays on the right */
+      justify-content: flex-end; 
       align-items: flex-end;
       padding: 15px;
       z-index: 10; /* Topmost layer */
@@ -157,7 +158,6 @@
       <img id="fgLayer" class="slide-image" src="" alt="">
       
       <div class="overlay">
-        <div class="slide-name" id="slideName" style="font-weight:bold; font-size:1.1rem; text-shadow:0 2px 4px black;">Loading...</div>
         <div class="status-indicator">
           <span id="playStatus" style="font-size:0.8rem; color:#ccc;">▶ Autoplay ON</span>
         </div>
@@ -327,7 +327,7 @@ const imageFiles = [
   "images/0(139).jpg", 
   "images/0(140).jpg", 
   "images/0(141).jpg", 
-  "images/0(142).jpg"
+  "images/0(142).jpg",
   "images/unnamed.jpg",
   "images/unnamed(1).jpg",
   "images/unnamed(2).jpg",
@@ -373,7 +373,7 @@ for (let i = imageFiles.length - 1; i > 0; i--) {
 // Elements
 const bgLayer = document.getElementById("bgLayer");
 const fgLayer = document.getElementById("fgLayer");
-const slideName = document.getElementById("slideName");
+// const slideName removed
 const progressBar = document.getElementById("progressBar");
 const counter = document.getElementById("counter");
 const playStatus = document.getElementById("playStatus");
@@ -401,9 +401,7 @@ function showSlide(index) {
   void fgLayer.offsetWidth; 
   fgLayer.classList.add("active");
 
-  // 3. Update Text
-  const niceName = src.split("/").pop().split(".")[0];
-  slideName.innerText = niceName;
+  // 3. Update Text (REMOVED NAME LOGIC)
   counter.innerText = (currentIndex + 1) + " / " + imageFiles.length;
   progressBar.style.width = ((currentIndex + 1) / imageFiles.length * 100) + "%";
 }
